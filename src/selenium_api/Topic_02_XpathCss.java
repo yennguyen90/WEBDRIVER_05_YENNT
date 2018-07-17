@@ -42,6 +42,19 @@ public class Topic_02_XpathCss {
   
   @Test
   public void TC_03_LoginEmailInvalid() {
+	  	//Step 01 - Truy cập vào trang: http://live.guru99.com/
+		//Step 02 - Click vào link "My Account" để tới trang đăng nhập
+	  driver.findElement(By.xpath("//div[@class='footer']//a[contains(text(), 'My Account' )]")).click();
+		//Step 03 - Nhập email invalid: 123434234@12312.123123
+	  driver.findElement(By.xpath("//input[@id='email']")).sendKeys("123434234@12312.123123");
+		//Step 04 - Click Login button
+	  driver.findElement(By.xpath("//input[@id='pass']")).sendKeys("");
+	  driver.findElement(By.xpath("//button[@id='send2']")).click();
+	  
+		//Step 05 - Verify error message xuất hiện:  Please enter a valid email address. For example johndoe@domain.com.
+	  String emailErrMsg = driver.findElement(By.xpath("//div[@id='advice-validate-email-email']")).getText();
+	  AssertJUnit.assertEquals("Please enter a valid email address. For example johndoe@domain.com.", emailErrMsg);
+
   }
   
   @Test
