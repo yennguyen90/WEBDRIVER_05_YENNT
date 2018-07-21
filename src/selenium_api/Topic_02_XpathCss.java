@@ -4,6 +4,8 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
 import org.testng.annotations.BeforeClass;
 import org.testng.AssertJUnit;
+
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 import org.openqa.selenium.By;
@@ -59,17 +61,61 @@ public class Topic_02_XpathCss {
   
   @Test
   public void TC_04_LoginPassIncorrect() {
+	     // Step 01 - Truy cập vào trang: http://live.guru99.com/
+		 //  Step 02 - Click vào link "My Account" để tới trang đăng nhập
+	  driver.findElement(By.xpath("//div[@class='footer']//a[contains(text(), 'My Account' )]")).click();
+		 // Step 03 - Nhập email correct and password incorrect: automation@gmail.com/ 123
+	  driver.findElement(By.xpath("//input[@id='email']")).sendKeys("automation"+ randomEmail()+"@gmail.com");
+	  driver.findElement(By.xpath("//input[@id='pass']")).sendKeys("123");
+		 // Step 04 - Click Login button
+	  driver.findElement(By.xpath("//button[@id='send2']")).click();
+		 //  Step 05 - Verify error message xuất hiện: Please enter 6 or more characters without leading or trailing spaces.
+	  String passErrMsg =  driver.findElement(By.xpath("//div[@id='advice-validate-password-pass']")).getText();
+	  AssertJUnit.assertEquals("Please enter 6 or more characters without leading or trailing spaces.", passErrMsg);
+	  
   }
   
   @Test
-  public void TC_05_CreateAccount() {
+  public void TC_05_CreateAccount() throws InterruptedException  {
+	//Step 01 - Truy cập vào trang: http://live.guru99.com/
+			//Step 02 - Click vào link "My Account" để tới trang đăng nhập
+		  driver.findElement(By.xpath("//div[@class='footer']//a[contains(text(), 'My Account' )]")).click();
+		//  Step 03 - Click CREATE AN ACCOUNT button để tới trang đăng kí tài khoản
+		  driver.findElement(By.xpath("//a[contains(@title,'Create an Account')]")).click();
+		  //Step 04 - Nhập thông tin hợp lệ vào tất cả các field: First Name/ Last Name/ Email Address/ Password/ Confirm Password
+		  driver.findElement(By.xpath("//input[@id='firstname']")).sendKeys("yen");
+		  driver.findElement(By.xpath("//input[@id='middlename']")).sendKeys("thi");
+		  driver.findElement(By.xpath("//input[@id='lastname']")).sendKeys("nguyen");
+		
+		  driver.findElement(By.xpath("//input[@id='email_address']")).sendKeys("automation"+ randomEmail() + "@gmail.com");
+		  driver.findElement(By.xpath("//input[@id='password']")).sendKeys("Yen123$");
+		  driver.findElement(By.xpath("//input[@id='confirmation']")).sendKeys("Yen123$");
+		 // (Lưu ý: Tạo random cho dữ liệu tại field Email Address)
+		//  Step 05 - Click REGISTER button
+		  driver.findElement(By.xpath("//button[@title=\"Register\"]")).click();
+		//  Step 05 - Verify message xuất hiện khi đăng kí thành công: Thank you for registering with Main Website Store.
+		  String successMsg = driver.findElement(By.xpath("//span[contains(text(),'Thank you for registering with Main Website Store.')]")).getText();
+		  AssertJUnit.assertEquals("Thank you for registering with Main Website Store.",successMsg);
+		//  Step 06 - Logout khỏi hệ thống
+		  driver.findElement(By.xpath("//div[@class='account-cart-wrapper']//span[contains(text(),'Account')]")).click();
+		  driver.findElement(By.xpath("//a[@title='Log Out']")).click();
+		//  Step 07 - Kiểm tra hệ thống navigate về Home page sau khi logout thành công
+		  Thread.sleep(10000);
+		 String urlhomepage =  driver.getCurrentUrl();
+		 AssertJUnit.assertEquals("http://live.guru99.com/index.php/",urlhomepage);
   }
-  
   
  
   @AfterClass
+ 
   public void afterClass() {
+	 
 	  driver.quit();
+  }
+  public int randomEmail() {
+	  Random random = new Random();
+	  int number = random.nextInt(999999);
+	  return number;
   }
 
 }
