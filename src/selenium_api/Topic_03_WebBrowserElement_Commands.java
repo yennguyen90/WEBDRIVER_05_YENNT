@@ -32,6 +32,13 @@ public class Topic_03_WebBrowserElement_Commands {
  @BeforeClass
  public void beforeClass() {
 	 driver = new FirefoxDriver();
+	// Chrome
+	// System.setProperty("webdriver.chrome.driver", ".\\driver\\chromedriver.exe");
+	// driver = new ChromeDriver();
+	// IE
+	//System.setProperty("webdriver.ie.driver", ".\\driver\\IEDriverServer.exe");
+	//driver = new InternetExplorerDriver();
+	
 	 driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
 	 driver.manage().window().maximize();
 	 driver.get("http://daominhdam.890m.com/");
@@ -185,7 +192,7 @@ public class Topic_03_WebBrowserElement_Commands {
   
   @AfterClass
   public void afterClass() {
-	  //driver.quit();
+	  driver.quit();
   }
 
 }
