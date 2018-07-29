@@ -37,24 +37,30 @@ public class Topic_04_DropdownTextbox {
 			 driver.manage().window().maximize();
 			
 	  }
-  //@Test
+  @Test
   public void TC_01_Dropdown() {
 	  driver.get("http://daominhdam.890m.com/");
       driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
 	 // Step 02 - Kiểm tra dropdown Job Role 01 không hỗ trợ thuộc tính multi-select
-	 
-	//  WebElement select = driver.findElement(By.id("//select[@id='job1']"));
-	 // Assert.assertFalse(select.isMultiple());
+	 Select jobRole01 = new Select(driver.findElement(By.xpath("//select[@id='job1']")));
+	 Assert.assertFalse(jobRole01.isMultiple());  
 	  // Step 03 - Chọn giá trị Automation Tester trong dropdown bằng phương thức selectVisible
+	 jobRole01.selectByVisibleText("Automation Tester");
 	  // Step 04 - Kiểm tra giá trị đã được chọn thành công
+	 Assert.assertEquals("Automation Tester", jobRole01.getFirstSelectedOption().getText());
 	  //Step 05 - Chọn giá trị Manual Tester trong dropdown bằng phương thức selectValue
+	 jobRole01.selectByValue("manual");
 	  //Step 06 - Kiểm tra giá trị đã được chọn thành công
+	 Assert.assertEquals("Manual Tester", jobRole01.getFirstSelectedOption().getText());
 	  // Step 07 - Chọn giá trị Mobile Tester trong dropdown bằng phương thức selectIndex
+	 jobRole01.selectByIndex(3);
 	  // Step 08 - Kiểm tra giá trị đã được chọn thành công
+	 Assert.assertEquals("Mobile Tester", jobRole01.getFirstSelectedOption().getText());
 	  //  Step 09 - Kiểm tra dropdown có đủ 5 giá trị
+	 Assert.assertEquals(5, jobRole01.getOptions().size());
 
   }
-  @Test
+  //@Test
   public void TC_03_Textbox_Textarea() {
 	  driver.get("http://demo.guru99.com/v4"); 
 	  
@@ -122,23 +128,14 @@ public class Topic_04_DropdownTextbox {
 	  String newadd = "America";
 	  addrbox.sendKeys(newadd);
 	  driver.findElement(By.xpath("//input[@name='sub']")).click();
-	  //addrbox.submit();
-	  
 	  
 	  //Verify giá trị tại 2 field: Customer Address và City đúng với dữ liệu sau khi đã Edit thành công
-	  ////td[text()='Address']/following-sibling::td
-	    //td[text()="City"]/following-sibling::td
 	  
 	  Assert.assertEquals(newcity, driver.findElement(By.xpath("//td[text()=\"City\"]/following-sibling::td")).getText());
 	  Assert.assertEquals(newadd, driver.findElement(By.xpath("//td[text()=\"Address\"]/following-sibling::td")).getText());
 	  
   }
   
-  public boolean Multile(String job1) {
-	  Select dropjob1 = (Select) driver.findElement(By.xpath(job1));
-	  return dropjob1.isMultiple();
-	  
-  }
   public int randomEmail() {
 	  Random random = new Random();
 	  int number = random.nextInt(999999);
@@ -148,7 +145,7 @@ public class Topic_04_DropdownTextbox {
 
   @AfterClass
   public void afterClass() {
-	//  driver.quit();
+	  driver.quit();
   }
 
 }
