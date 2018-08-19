@@ -4,6 +4,7 @@ import org.testng.annotations.Test;
 import org.testng.annotations.BeforeClass;
 
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.openqa.selenium.By;
@@ -34,8 +35,8 @@ public class Topic_08_IFrame_windows {
 		  driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 		  driver.manage().window().maximize();
   }
-  @Test
-  public void TC_01_() {
+  //@Test
+  public void TC_01_IFrame() {
 	  driver.get(" http://www.hdfcbank.com/");
 	  //switch to iframe 
 	  //step 01 : check close popup display
@@ -94,23 +95,96 @@ public class Topic_08_IFrame_windows {
 	  
   }
   
-  @Test
-  public void TC_02_() {
+ // @Test
+  public void TC_02_Windows() {
+	      //Step 01 - Truy cập vào trang: http://daominhdam.890m.com/
+	  driver.get("http://daominhdam.890m.com/");
+	  String parentId = driver.getWindowHandle();
+		  //Step 02 - Click "Opening a new window: Click Here" link -> Switch qua tab mới
+	  driver.findElement(By.xpath("//label[text()='Opening a new window:']/following-sibling::a")).click();
+	  switchToChildWindowByGUID(parentId);
+		  //Step 03 - Kiểm tra title của window mới = Google
+	  Assert.assertEquals(driver.getTitle(), "Google");
+		  //Step 04 - Close window mới
+	  driver.close();
+		  //Step 05 - Switch về parent window
   }
   
   @Test
   public void TC_03_() {
+	      // Step 01 - Truy cập vào trang: http://www.hdfcbank.com/
+	  driver.get("http://www.hdfcbank.com/");
+		 // Step 02 - Kiểm tra và close quảng cáo nếu có xuất hiện
+	  List<WebElement> notiIframe = driver.findElements(By.xpath("//iframe[@id='vizury-notification-template']"));
+	  if(notiIframe.size() > 0) {
+		  driver.switchTo().frame(notiIframe.get(0));
+		//step 02
+		  //driver.findElement(By.xpath("//div[@id='div-close']")).click(); 
+		  WebElement closeIcon = driver.findElement(By.xpath("//div[@id='div-close']"));
+		  JavascriptExecutor js = (JavascriptExecutor) driver;
+		  js.executeScript("arguments[0].click();", closeIcon);
+		  System.out.println("Close popup");
+		  //Switch to Topwindows
+		  driver.switchTo().defaultContent();
+		  
+	  }
+	  String parentID = driver.getWindowHandle();
+		  // Step 03 - Click Angri link -> Mở ra tab/window mới -> Switch qua tab mới
+	  driver.findElement(By.xpath("//a[text()='Agri']")).click();
+	  switchToChildWindowByGUID(parentID);
+	  System.out.println("tilte mới = " + driver.getTitle() );
+	 // Step 04 - Click Account Details link -> Mở ra tab/window mới -> Switch qua tab mới
+	  driver.findElement(By.xpath("//p[text()='Account Details']")).click();
+	  switchToWindowByTitle("Welcome to HDFC Bank NetBanking");
+	  //Step 05- Click Privacy Policy link (nằm trong frame) -> Mở ra tab/window mới -> Switch qua tab mới
+	  WebElement Footerframe = driver.findElement(By.xpath("//frame[@name='footer']"));
+	  driver.switchTo().frame(Footerframe);
+	  driver.findElement(By.xpath("//a[text()='Privacy Policy']")).click();
+	  switchToWindowByTitle("HDFC Bank - Leading Bank in India, Banking Services, Private Banking, Personal Loan, Car Loan");
+	  //Step 06- Click CSR link on Privacy Policy page
+	  driver.findElement(By.xpath("//a[@title='Corporate Social Responsibility']"));
+	  //Step 08 - Close tất cả popup khác - chỉ giữ lại parent window (http://www.hdfcbank.com/)
+	  closeAllWithoutParentWindows(parentID);
+	  System.out.println(driver.getCurrentUrl());
+	  
   }
+  // 2 windows
+  public void switchToChildWindowByGUID(String parentID) {
+      Set<String> allWindows = driver.getWindowHandles();
+      for (String runWindow : allWindows) {
+                  if (!runWindow.equals(parentID)) {
+                              driver.switchTo().window(runWindow);
+                              break;
+                  }
+      }
+}
+  // > 2windows
+  public void switchToWindowByTitle(String title) {
+      Set<String> allWindows = driver.getWindowHandles();
+      for (String runWindows : allWindows) {
+                  driver.switchTo().window(runWindows);
+                  String currentWin = driver.getTitle();
+                  if (currentWin.equals(title)) {
+                              break;
+                  }
+      }
+}
   
-  @Test
-  public void TC_04_() {
+  //Close all windows without parent window
+  public boolean closeAllWithoutParentWindows(String parentWindow) {
+              Set<String> allWindows = driver.getWindowHandles();
+              for (String runWindows : allWindows) {
+                          if (!runWindows.equals(parentWindow)) {
+                                      driver.switchTo().window(runWindows);
+                                      driver.close();
+                          }
+              }
+              driver.switchTo().window(parentWindow);
+              if (driver.getWindowHandles().size() == 1)
+                         return true;
+              else
+                         return false;
   }
-  
-  @Test
-  public void TC_05_() {
-  }
-  
-  
   public void afterClass() throws Exception {
 	//  Thread.sleep(3000);
 	  driver.quit();
