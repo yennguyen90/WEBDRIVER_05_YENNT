@@ -8,10 +8,12 @@ import java.awt.Toolkit;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Assert;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -22,6 +24,13 @@ public class Topic_10_UploadFile {
 	  WebDriver driver;
 	  String projectDirectory = System.getProperty("user.dir");
 	  String fileName = "h1.png";
+	  String fileName_01 = "h1.png";
+	  String fileName_02 = "h2.png";
+	  String fileName_03 = "h3.png";
+	  String uploadFilePath_01 = projectDirectory +"\\img\\" + fileName_01;
+	  String uploadFilePath_02= projectDirectory +"\\img\\" + fileName_02;
+	  String uploadFilePath_03 = projectDirectory +"\\img\\" + fileName_03;
+	  
 	  String uploadFilePath = projectDirectory + "\\img\\"+ fileName;
 	  String chromeUpload = projectDirectory + "\\Upload\\chrome.exe";
 	  String firefoxUpload = projectDirectory + "\\Upload\\firefox.exe";
@@ -78,7 +87,7 @@ public class Topic_10_UploadFile {
 	    driver.findElement(By.xpath("//table[@class='table table-striped']//button[@class='btn btn-primary start']")).click();
 	    Assert.assertTrue(driver.findElement(By.xpath("//a[text()='h1.png']")).isDisplayed());
 	  }
-	  @Test
+	 // @Test
 	  public void TC_03_UploadfileByRobot() throws Exception {
 		  driver.get("http://blueimp.github.com/jQuery-File-Upload/");
 	      //define location của filename
@@ -110,13 +119,40 @@ public class Topic_10_UploadFile {
 		   // Assert.assertTrue(driver.findElement(By.xpath("//p[@class='name']/a[@title='"+ fileName +"']")).isDisplayed());
 	  }
 	  @Test
-	  public void TC_04_UploadFile() {
+	  public void TC_04_UploadMultipleFiles() {
+		  driver.get("http://blueimp.github.com/jQuery-File-Upload/");
+		  String file[] = {uploadFilePath_01, uploadFilePath_02, uploadFilePath_03};
+		  for(int i = 0; i<file.length; i++) {
+			  WebElement uploadElement = driver.findElement(By.xpath("//input[@type='file']"));
+			  uploadElement.sendKeys(file[i]);
+		  }
+		  Assert.assertTrue(driver.findElement(By.xpath("//p[@class='name' and text()='"+ fileName_01 +"']")).isDisplayed());
+		  Assert.assertTrue(driver.findElement(By.xpath("//p[@class='name' and text()='"+ fileName_02 +"']")).isDisplayed());
+		  Assert.assertTrue(driver.findElement(By.xpath("//p[@class='name' and text()='"+ fileName_03 +"']")).isDisplayed());
+	 //click start
+		  List<WebElement> startButton = driver.findElements(By.xpath("//table//button[@class='btn btn-primary start']"));
+		  for(WebElement start : startButton) {
+			  start.click();
+		  }
+		  Assert.assertTrue(driver.findElement(By.xpath("//p[@class='name']/a[@title='"+ fileName_01 +"']")).isDisplayed());
+		  Assert.assertTrue(driver.findElement(By.xpath("//p[@class='name']/a[@title='"+ fileName_02 +"']")).isDisplayed());
+		  Assert.assertTrue(driver.findElement(By.xpath("//p[@class='name']/a[@title='"+ fileName_03 +"']")).isDisplayed());
+		  //check không phải là img lỗi (real img)
+		  List<WebElement> images = driver.findElements(By.xpath("//table[@class='table table-striped']//img"));
+		  for (WebElement img : images) {
+			  Assert.assertTrue(checkAnyImageLoaded(img));
+		  }
+		  
 		  
 	  }
 	  @AfterClass
 	  public void afterClass() throws Exception {
 		  Thread.sleep(3000);
 		  driver.quit();
+	  }
+	  public boolean checkAnyImageLoaded(WebElement image) {
+		  JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
+		  return (boolean) jsExecutor.executeScript("return arguments[0].complete &&" + "typeof arguments[0].naturalWidth != 'undefined' && arguments[0].naturalWidth > 0", image);
 	  }
 
 	}
