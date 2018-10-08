@@ -1,16 +1,25 @@
 package selenium_api;
 
 import org.testng.annotations.Test;
+
+import com.google.common.base.Function;
+
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 
+import java.util.NoSuchElementException;
+//import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeUnit;
+
+//import java.util.NoSuchElementException;
+//import java.util.concurrent.TimeUnit;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
@@ -23,7 +32,7 @@ public class Topic_11_WebdriverWait {
 	@BeforeMethod
 	public void beforeMethod() {
 		driver = new FirefoxDriver();
-		driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
+		driver.manage().timeouts().implicitlyWait(20, TimeUnit.SECONDS);
 		
 		// wait = new WebDriverWait(driver, 30); //30s
 		// Chrome
@@ -44,7 +53,7 @@ public class Topic_11_WebdriverWait {
 		// div[@id='finish']//h4[text()='Hello World!']
 	}
 
-	@Test
+	//@Test
   public void Explicit_Wait() {
 	  driver.get("http://demos.telerik.com/aspnet-ajax/ajaxloadingpanel/functionality/explicit-show-hide/defaultcs.aspx");
 	 // driver.findElement(By.xpath("//div[@id='start']//button")).click();
@@ -68,6 +77,34 @@ public class Topic_11_WebdriverWait {
 	  Assert.assertEquals("Monday, October 08, 2018", DayAfter);
   }
 
+	@Test
+	public void Fluent_Wait() {
+		WebDriverWait wait = new WebDriverWait(driver, 30);
+		driver.get("https://daominhdam.github.io/fluent-wait/");
+		WebElement countdount =  driver.findElement(By.xpath("//div[@id='javascript_countdown_time']"));
+		wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[@id='javascript_countdown_time']")));
+		
+		// Khởi tạo Fluent wait
+		new FluentWait<WebElement>(countdount)
+		           // Tổng time wait là 15s
+		           .withTimeout(15, TimeUnit.SECONDS)
+		            // Tần số mỗi 1s check 1 lần
+		            .pollingEvery(1, TimeUnit.SECONDS)
+		           // Nếu gặp exception là find ko thấy element sẽ bỏ  qua
+		            .ignoring(NoSuchElementException.class)
+		            // Kiểm tra điều kiện
+		            .until(new Function<WebElement, Boolean>() {
+		                public Boolean apply(WebElement element) {
+		                           // Kiểm tra điều kiện countdount = 00
+		                           boolean flag =  element.getText().endsWith("00");
+		                           System.out.println("Time = " +  element.getText());
+		                           // return giá trị cho function apply
+		                           return flag;
+		                      }
+		               });
+	}
+	
+	
 	@AfterMethod
 	public void afterMethod() {
 		driver.quit();
